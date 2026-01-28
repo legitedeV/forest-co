@@ -1,0 +1,33 @@
+{
+  email ${CADDY_EMAIL}
+}
+
+forestco.pl {
+  reverse_proxy web-forestco:3000
+}
+
+forestcatering.pl {
+  reverse_proxy web-forestcatering:3000
+}
+
+forestbar.pl {
+  reverse_proxy web-forestbar:3000
+}
+
+admin.forestco.pl {
+  basicauth {
+    ${ADMIN_USER} ${ADMIN_PASSWORD_HASH}
+  }
+  reverse_proxy medusa:9000
+}
+
+cms.forestco.pl {
+  basicauth {
+    ${CMS_USER} ${CMS_PASSWORD_HASH}
+  }
+  reverse_proxy strapi:1337
+}
+
+api.forestco.pl {
+  reverse_proxy medusa:9000
+}

@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web-forestco
+      - web-forestcatering
+      - web-forestbar
+      - medusa
+      - strapi
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-forest}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-forest}
+      POSTGRES_DB: ${POSTGRES_DB:-forest}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  medusa:
+    image: ghcr.io/medusajs/medusa:latest
+    environment:
+      DATABASE_URL: ${MEDUSA_DATABASE_URL:-postgres://forest:forest@postgres:5432/forest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  strapi:
+    image: strapi/strapi:latest
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${STRAPI_DATABASE_NAME:-forest}
+      DATABASE_USERNAME: ${POSTGRES_USER:-forest}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-forest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web-forestco:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["sh", "-c", "echo 'web-forestco placeholder' && sleep 3600"]
+
+  web-forestcatering:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["sh", "-c", "echo 'web-forestcatering placeholder' && sleep 3600"]
+
+  web-forestbar:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["sh", "-c", "echo 'web-forestbar placeholder' && sleep 3600"]
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

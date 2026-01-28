@@ -1,0 +1,12 @@
+{
+  "name": "@forest/strapi",
+  "private": true,
+  "scripts": {
+    "dev": "strapi develop",
+    "build": "strapi build",
+    "start": "strapi start",
+    "lint": "echo \"strapi lint placeholder\"",
+    "typecheck": "echo \"strapi typecheck placeholder\"",
+    "test": "echo \"no tests\""
+  }
+}

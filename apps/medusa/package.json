@@ -1,0 +1,12 @@
+{
+  "name": "@forest/medusa",
+  "private": true,
+  "scripts": {
+    "dev": "medusa develop",
+    "build": "medusa build",
+    "start": "medusa start",
+    "lint": "echo \"medusa lint placeholder\"",
+    "typecheck": "echo \"medusa typecheck placeholder\"",
+    "test": "echo \"no tests\""
+  }
+}
