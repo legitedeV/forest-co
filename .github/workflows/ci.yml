@@ -1,8 +1,8 @@
-name: ci
+name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -10,21 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
-      - run: pnpm install
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm build
-      - name: Generate screenshots (placeholder)
-        run: ./scripts/generate-screenshots.sh artifacts
-      - name: Upload screenshots
-        uses: actions/upload-artifact@v4
+      - name: Install dependencies
+        run: npm install -g pnpm && pnpm install
+      - name: Build web apps
+        run: pnpm --filter web-forestco build && pnpm --filter web-forestcatering build && pnpm --filter web-forestbar build
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      - name: Start web apps
+        run: |
+          pnpm --filter web-forestco start -- --port 3001 &
+          pnpm --filter web-forestcatering start -- --port 3002 &
+          pnpm --filter web-forestbar start -- --port 3003 &
+          sleep 10
+      - name: Capture screenshots
+        run: node ./scripts/ci-screenshots.js
+      - uses: actions/upload-artifact@v4
         with:
           name: screenshots
-          path: artifacts
+          path: artifacts/screenshots

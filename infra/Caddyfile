@@ -14,10 +14,7 @@ forestbar.pl {
   reverse_proxy web-forestbar:3000
 }
 
-admin.forestco.pl {
-  basicauth {
-    ${ADMIN_USER} ${ADMIN_PASSWORD_HASH}
-  }
+api.forestco.pl {
   reverse_proxy medusa:9000
 }
 
@@ -26,8 +23,4 @@ cms.forestco.pl {
     ${CMS_USER} ${CMS_PASSWORD_HASH}
   }
   reverse_proxy strapi:1337
-}
-
-api.forestco.pl {
-  reverse_proxy medusa:9000
 }

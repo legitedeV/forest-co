@@ -20,6 +20,9 @@ pnpm build
 
 ```bash
 cd infra
-cp env.example .env
+./scripts/gen-secrets.sh
 ./scripts/deploy.sh
+./scripts/db-ensure.sh
+./scripts/seed-medusa.sh
+./scripts/seed-strapi.sh
 ```

@@ -1,3 +1,3 @@
-# web-forestcatering
+# ForestCatering Web
 
-Next.js marketing site powered by Strapi.
+Aplikacja frontowa dla forestcatering.pl zbudowana w Next.js (App Router).

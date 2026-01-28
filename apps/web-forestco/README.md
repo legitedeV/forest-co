@@ -1,3 +1,3 @@
-# web-forestco
+# ForestCo Web
 
-Next.js storefront + landing for forestco.pl.
+Aplikacja frontowa dla forestco.pl zbudowana w Next.js (App Router).

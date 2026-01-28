@@ -1,3 +1,3 @@
-# web-forestbar
+# ForestBar Web
 
-Next.js marketing site powered by Strapi.
+Aplikacja frontowa dla forestbar.pl zbudowana w Next.js (App Router).

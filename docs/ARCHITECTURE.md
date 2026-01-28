@@ -1,22 +1,22 @@
 # Architecture
 
-## Overview
+## Routing
 
-- Caddy terminates TLS and routes to Next.js, Medusa, and Strapi.
-- Medusa provides commerce APIs/admin.
-- Strapi provides content and page sections.
-- Postgres is shared initially (can be split later).
-- No MinIO/Redis by default for MVP simplicity.
+- `forestco.pl` -> `web-forestco`
+- `forestcatering.pl` -> `web-forestcatering`
+- `forestbar.pl` -> `web-forestbar`
+- `api.forestco.pl` -> `medusa`
+- `cms.forestco.pl` -> `strapi` (BasicAuth)
 
-## Flow
+## Data flow
 
-```
-Strapi -> Next.js (content + preview)
-Medusa -> Next.js (products/checkout)
-Caddy -> public domains + admin subdomains
-```
+- Strapi -> Next.js (ForestCatering / ForestBar): treści stron i sekcje.
+- Medusa -> Next.js (ForestCo): produkty do sklepu i detale.
 
-## Decision notes
+## Services
 
-- MinIO omitted: local volumes first, add when scaling.
-- Redis omitted: add if queues/background jobs needed.
+- Caddy: TLS i reverse proxy.
+- Postgres: bazy `forest_medusa` i `forest_strapi`.
+- Redis: cache dla Medusa.
+- Medusa: API produktów.
+- Strapi: CMS dla treści.
