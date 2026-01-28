@@ -19,4 +19,9 @@
 - Postgres: bazy `forest_medusa` i `forest_strapi`.
 - Redis: cache dla Medusa.
 - Medusa: API produktów.
-- Strapi: CMS dla treści.
+- Strapi (v4): CMS dla treści.
+
+## Strapi versioning
+
+- Strapi jest pinowany do v4, ponieważ publiczny registry npm nie udostępnia jeszcze kompletnego zestawu paczek v5 (`@strapi/plugin-*`), co powodowało błąd `ETARGET` przy `npm install`.
+- Po pełnym wydaniu Strapi v5 należy zaktualizować zależności i lockfile do wspieranych wersji.
