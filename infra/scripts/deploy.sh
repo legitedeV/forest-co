@@ -3,6 +3,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-docker compose pull
+docker compose pull --ignore-buildable
+docker compose up -d --build
 
-docker compose up -d

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   caddy:
     image: caddy:2-alpine
@@ -22,37 +20,60 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-forest}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-forest}
-      POSTGRES_DB: ${POSTGRES_DB:-forest}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+
   medusa:
-    image: ghcr.io/medusajs/medusa:latest
+    build:
+      context: ../apps/medusa
+      dockerfile: Dockerfile
+    pull_policy: never
     environment:
-      DATABASE_URL: ${MEDUSA_DATABASE_URL:-postgres://forest:forest@postgres:5432/forest}
+      NODE_ENV: production
+      DATABASE_URL: ${MEDUSA_DATABASE_URL:-postgres://forest:forest@postgres:5432/forest_medusa?sslmode=disable}
+      REDIS_URL: ${MEDUSA_REDIS_URL:-redis://redis:6379}
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      redis:
+        condition: service_started
 
   strapi:
-    image: strapi/strapi:latest
+    build:
+      context: ../apps/strapi
+      dockerfile: Dockerfile
+    pull_policy: never
     environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
-      DATABASE_NAME: ${STRAPI_DATABASE_NAME:-forest}
+      DATABASE_NAME: ${STRAPI_DATABASE_NAME:-forest_strapi}
       DATABASE_USERNAME: ${POSTGRES_USER:-forest}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-forest}
+      DATABASE_SSL: "false"
+
+      APP_KEYS: ${STRAPI_APP_KEYS}
+      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      JWT_SECRET: ${STRAPI_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
+      ENCRYPTION_KEY: ${STRAPI_ENCRYPTION_KEY}
+    volumes:
+      - strapi_uploads:/opt/app/public/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -76,3 +97,4 @@ volumes:
   postgres_data:
   caddy_data:
   caddy_config:
+  strapi_uploads:
