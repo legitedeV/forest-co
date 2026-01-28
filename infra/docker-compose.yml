@@ -29,6 +29,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:7-alpine
@@ -47,6 +49,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    ports:
+      - "9000:9000"
 
   strapi:
     build:
@@ -77,21 +81,47 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "1337:1337"
 
   web-forestco:
-    image: node:20-alpine
-    working_dir: /app
-    command: ["sh", "-c", "echo 'web-forestco placeholder' && sleep 3600"]
+    build:
+      context: ../apps/web-forestco
+      dockerfile: Dockerfile
+    pull_policy: never
+    environment:
+      NODE_ENV: production
+      MEDUSA_BACKEND_URL: ${MEDUSA_PUBLIC_URL:-http://medusa:9000}
+    depends_on:
+      - medusa
+    ports:
+      - "3001:3000"
 
   web-forestcatering:
-    image: node:20-alpine
-    working_dir: /app
-    command: ["sh", "-c", "echo 'web-forestcatering placeholder' && sleep 3600"]
+    build:
+      context: ../apps/web-forestcatering
+      dockerfile: Dockerfile
+    pull_policy: never
+    environment:
+      NODE_ENV: production
+      STRAPI_URL: ${STRAPI_PUBLIC_URL:-http://strapi:1337}
+    depends_on:
+      - strapi
+    ports:
+      - "3002:3000"
 
   web-forestbar:
-    image: node:20-alpine
-    working_dir: /app
-    command: ["sh", "-c", "echo 'web-forestbar placeholder' && sleep 3600"]
+    build:
+      context: ../apps/web-forestbar
+      dockerfile: Dockerfile
+    pull_policy: never
+    environment:
+      NODE_ENV: production
+      STRAPI_URL: ${STRAPI_PUBLIC_URL:-http://strapi:1337}
+    depends_on:
+      - strapi
+    ports:
+      - "3003:3000"
 
 volumes:
   postgres_data:
